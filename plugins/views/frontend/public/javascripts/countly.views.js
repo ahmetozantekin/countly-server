@@ -39,6 +39,9 @@ window.ViewsView = countlyView.extend({
         }
         
         var domains = countlyViews.getDomains();
+
+        
+
         for(var i = 0; i < domains.length; i++){
             domains[i] = countlyCommon.decode(domains[i]);
         }
@@ -51,6 +54,8 @@ window.ViewsView = countlyView.extend({
             "usage":usage,
             "domains":domains
         };
+
+        console.log(this.templateData);
 
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));

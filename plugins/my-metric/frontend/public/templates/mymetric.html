@@ -1,0 +1,126 @@
+<div class="widget views-widget">
+	<div class="widget-header">
+		<div class="left">
+            {{#if segmentations}}
+            <div class="title small">{{page-title}}</div>
+            {{else}}
+			<div class="title">{{page-title}}</div>
+            {{/if}}
+            <div class="event-segmentation">
+				{{#if segmentations}}
+				<div class="cly-select float">
+					<div class="select-inner">
+						<div class="text-container">
+							<div class="text">{{active-segmentation}}</div>
+						</div>
+						<div class="right combo"></div>
+					</div>
+					<div class="select-items square" style="width:220px;">
+						<div>
+							<div data-value="" class="segmentation-option item" data-localize="views.all-segments"></div>
+							{{#eachOfArray segmentations}}
+							<div data-value="{{value}}" class="segmentation-option item">{{value}}</div>
+							{{/eachOfArray}}
+						</div>
+					</div>
+				</div>
+				{{/if}}
+			</div>
+		</div>
+		{{> date-selector }}
+	</div>
+    <div class="widget-content" style="border:none;">
+    </div>
+	<div class="widget-footer" style="height:220px; padding-top:20px; padding-bottom:10px; overflow:visible; box-shadow:none; position:relative;">
+        <div id="empty-graph" data-localize="views.empty-graph"></div>
+		<div id="dashboard-graph" class="graph" style="height:100%; margin-left:-10px;"></div>
+        <div class="graph-no-data">
+            <div class="inner">
+                <div class="icon"></div>
+                <div class="text" data-localize="common.graph.no-data"></div>
+            </div>
+        </div>
+	</div>
+</div>
+
+
+<div class="dashboard-summary" id="my-metric-dashboard-summary">
+    <div class="item help-zone-vs" data-help-localize="help.dashboard.top-platforms">
+        <div class="inner" id="valuesBar">
+            <div class="title">TOP METRIC VALUES</div>
+
+            <div class="bar" ></div>
+           
+        </div>
+    </div>
+
+    <div class="item help-zone-vs" data-help-localize="help.dashboard.top-sources">
+        <div class="inner" id="valuesTimeBar">
+            <div class="title">Top Dates</div>
+            <div class="bar"></div>
+        </div>
+    </div>
+</div>
+
+
+<div id="dataTableOne_wrapper" class="dataTables_wrapper" role="grid" style="display: block;">
+    <div class="dataTable-top">
+        <div id="dataTableOne_length" class="dataTables_length" style="display: none;">
+            <label>Display
+                <input type="number" id="dataTables_length_input">
+            </label>
+        </div>
+        <div class="search-table-data">
+            <i class="fa fa-search"></i>
+        </div>
+        <div class="dataTables_filter" id="dataTableOne_filter">
+            <input type="text" aria-controls="dataTableOne" placeholder="Search">
+        </div>
+        <div class="dataTables_paginate paging_four_button">
+            <span class="paginate_disabled_previous">
+                <i class="fa fa-angle-double-left"></i>
+            </span>
+            <span class="paginate_disabled_previous">
+                <i class="fa fa-angle-left"></i>
+            </span>
+            <span class="paginate_disabled_next">
+                <i class="fa fa-angle-right"></i>
+            </span>
+            <span class="paginate_disabled_next">
+                <i class="fa fa-angle-double-right"></i>
+            </span>
+        </div>
+        <div class="save-table-data server-export countly-drop-target" data-help="help.datatables-export">
+            <i class="fa fa-download"></i>
+        </div>
+        <div class="DTTT_container"></div>
+    </div>
+    <table id="dataTableMetrics" class="d-table help-zone-vb dataTable" cellpadding="0" cellspacing="0" data-help-localize="help.{{{table-helper}}}"
+        aria-describedby="dataTableOne_info">
+        <thead>
+            <tr role="row">
+                <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Device: activate to sort column descending">DATE</th>
+                <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Total Sessions: activate to sort column ascending">COUNT</th>
+            </tr>
+        </thead>
+        <tbody role="alert" aria-live="polite" aria-relevant="all">
+            
+        </tbody>
+    </table>
+    <div class="sticky-header hide" style="width: 1078px; top: 59px;">
+        <table class="d-table dataTable" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr role="row">
+                    <th class="sorting_asc" tabindex="0" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Device: activate to sort column descending"
+                        style="width: 249px; border-radius: 0px;">Device</th>
+                    <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Total Sessions: activate to sort column ascending" style="width: 249px; border-radius: 0px;">Total Sessions</th>
+                    <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Total Visitors: activate to sort column ascending" style="width: 249px; border-radius: 0px;">Total Visitors</th>
+                    <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="New Visitors: activate to sort column ascending" style="width: 250px; border-radius: 0px;">New Visitors</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="dataTable-bottom" style="display: block;">
+        <div class="dataTables_info" id="dataTableMetrics_info"></div>
+    </div>
+</div>

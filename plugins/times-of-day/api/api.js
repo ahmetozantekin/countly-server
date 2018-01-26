@@ -4,6 +4,10 @@ var plugin = {},
 	async = require('async');
 
 (function (plugin) {
+
+
+	
+
 	plugins.register("/i", function (ob) {
 		var params = ob.params;
 
@@ -214,6 +218,9 @@ var plugin = {},
 	plugins.register("/i/apps/delete", function (ob) {
 		common.db.collection("timesofday" + ob.appId).drop(function () { });
 	});
+
+
+
 }(plugin));
 
 module.exports = plugin;

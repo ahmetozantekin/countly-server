@@ -1,0 +1,6 @@
+#my-metric-dashboard-summary .item{
+    width: 50%;
+}
+#dataTableMetrics tr:nth-child(even) {
+    background-color: #F9F9F9;
+}
