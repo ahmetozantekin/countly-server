@@ -1,10 +1,11 @@
 var plugin = {},
 	common = require('../../../api/utils/common.js'),
 	plugins = require('../../pluginManager.js'),
-	async = require('async');
+	async = require('async'),
+	moment = require('moment');
 
 (function (plugin) {
-	
+
 	/* 
 	    @methodName        compare
 		@methodDescription Compare between two object's by my_metric_count value
@@ -17,7 +18,7 @@ var plugin = {},
 		}
 		@return {boolean}
 	*/
-	function compare(a,b) {
+	function compare(a, b) {
 		if (a.my_metric_count < b.my_metric_count)
 			return -1;
 		if (a.my_metric_count > b.my_metric_count)
@@ -47,32 +48,32 @@ var plugin = {},
 		var params = ob.params;
 
 		// Requirement validation of params for API requests
-		if (!params.qstring.app_key && !params.qstring.device_id) 
+		if (!params.qstring.app_key || !params.qstring.device_id) {
+			common.returnMessage(params, 400, 'Missing params app_key or device_id');
 			return false;
+		}
 
 		// Get params
-		var my_metric    = params.qstring.my_metric;
+		var my_metric = params.qstring.my_metric;
 		var metric_count = params.qstring.my_metric_count;
-		var appId 		 = params.qstring.app_id;
-		var date 		 = params.qstring.date;
-		// var newDate = new Date();
-		// var month = [];
+		var appId = params.qstring.app_id;
+		var newDate = moment().format();
 
 		// Mongo collection name
 		var collectionName = "my_metric" + appId;
-		
+
 		// Object filled with parameters for mongo insert
 		var metric = {};
 		metric.my_metric = ob.params.qstring.my_metric;
 		metric.my_metric_count = ob.params.qstring.my_metric_count;
-		metric.date = date;
+		metric.date = newDate;
 
 		//  Inserting object in collection
-		common.db.collection(collectionName).insert(metric, function (err, res) { 
-			if(err){
+		common.db.collection(collectionName).insert(metric, function (err, res) {
+			if (err) {
 				common.returnMessage(params, 400, 'Something went wrong');
 				return false;
-			} else{
+			} else {
 				common.returnMessage(params, 200, 'Success');
 				return true;
 			}
@@ -81,7 +82,7 @@ var plugin = {},
 	});
 
 
-	
+
 	/*
 		@exampleRequest http://[server-ip]/o/my-metric?method=[method-name]?app_key=[app-key]&device_id=[device-id]&app_id=[app-id]
 		@params method {String}
@@ -101,15 +102,15 @@ var plugin = {},
 	*/
 	plugins.register("/o/my-metric", function (ob) {
 		var params = ob.params;
-		
+
 		// Requirement validation of params for API requests
 		if (!params.qstring.app_key && !params.qstring.device_id) {
 			return false;
 		}
 
-		var appId = params.qstring.app_id;		
+		var appId = params.qstring.app_id;
 		var collectionName = "my_metric" + appId;
-		
+
 
 		/*
 			If 'method' parameters value is 'top-metric-values', 
@@ -117,39 +118,39 @@ var plugin = {},
 
 			@exampleRequest http://[server-ip]/o/my-metric?method=top-metric-values?app_key=[app-key]&device_id=[device-id]&app_id=[app-id]
 		*/
-		if(params.qstring.method == "top-metric-values"){
+		if (params.qstring.method == "top-metric-values") {
 			common.db.collection(collectionName).find({}).toArray(function (err, res) {
-				if(err){
+				if (err) {
 					common.returnMessage(params, 400, 'Something went wrong');
 					return false;
 				}
 				var uniques = [];
-				res.forEach(function(obj) {
+				res.forEach(function (obj) {
 					let included = false;
 					obj.my_metric_count = parseInt(obj.my_metric_count);
-					uniques.forEach(function(unq) {
+					uniques.forEach(function (unq) {
 						if (obj.my_metric == unq.my_metric) {
 							unq.my_metric_count = parseInt(obj.my_metric_count) + parseInt(unq.my_metric_count);
 							included = true;
-						} 
+						}
 					})
 					if (!included) {
 						uniques.push(
 							{
-								"my_metric":obj.my_metric,
-								"my_metric_count":obj.my_metric_count
+								"my_metric": obj.my_metric,
+								"my_metric_count": obj.my_metric_count
 							}
 						);
 					}
 				})
 				uniques.sort(compare);
-				var finalArray = [uniques[uniques.length - 1],uniques[uniques.length - 2],uniques[uniques.length - 3]];
+				var finalArray = [uniques[uniques.length - 1], uniques[uniques.length - 2], uniques[uniques.length - 3]];
 				common.returnOutput(params, JSON.parse(JSON.stringify(finalArray)));
 				return true;
 			});
 
 			return true;
-		
+
 		}
 
 		/*
@@ -160,31 +161,32 @@ var plugin = {},
 		*/
 		else if (params.qstring.method == "top-metric-dates") {
 			common.db.collection(collectionName).find({}).toArray(function (err, res) {
-				if(err){
+				if (err) {
 					common.returnMessage(params, 400, 'Something went wrong');
 					return false;
 				}
 				var uniques = [];
-				res.forEach(function(obj) {
+				res.forEach(function (obj) {
 					let included = false;
 					obj.my_metric_count = parseInt(obj.my_metric_count);
-					uniques.forEach(function(unq) {
-						if (obj.date == unq.date) {
+					uniques.forEach(function (unq) {
+						// checking between dates are that same day with moment js
+						if (moment(unq.date).isSame(obj.date, 'day')) {
 							unq.my_metric_count = parseInt(obj.my_metric_count) + parseInt(unq.my_metric_count);
 							included = true;
-						} 
+						}
 					})
 					if (!included) {
-						uniques.push({"my_metric":obj.my_metric,"my_metric_count":obj.my_metric_count, "date":obj.date});
+						uniques.push({ "my_metric": obj.my_metric, "my_metric_count": obj.my_metric_count, "date": obj.date });
 					}
 				})
 				uniques.sort(compare);
-				var finalArray = [uniques[uniques.length - 1],uniques[uniques.length - 2],uniques[uniques.length - 3]];
+				var finalArray = [uniques[uniques.length - 1], uniques[uniques.length - 2], uniques[uniques.length - 3]];
 				common.returnOutput(params, JSON.parse(JSON.stringify(finalArray)));
 				return true;
 			});
 
-			return  true;
+			return true;
 		}
 
 		/*
@@ -195,29 +197,29 @@ var plugin = {},
 		*/
 		else {
 			common.db.collection(collectionName).find({}).toArray(function (err, res) {
-				if(err){
+				if (err) {
 					common.returnMessage(params, 400, 'Something went wrong');
 					return false;
 				}
 				var uniques = [];
-				res.forEach(function(obj) {
+				res.forEach(function (obj) {
 					let included = false;
 					obj.my_metric_count = parseInt(obj.my_metric_count);
-					uniques.forEach(function(unq) {
-						if (obj.date == unq.date) {
+					uniques.forEach(function (unq) {
+						if (moment(unq.date).isSame(obj.date, 'day')) {
 							unq.my_metric_count = parseInt(obj.my_metric_count) + parseInt(unq.my_metric_count);
 							included = true;
-						} 
+						}
 					})
 					if (!included) {
-						uniques.push({"my_metric":obj.my_metric,"my_metric_count":obj.my_metric_count, "date":obj.date});
+						uniques.push({ "my_metric": obj.my_metric, "my_metric_count": obj.my_metric_count, "date": obj.date });
 					}
 				})
 				common.returnOutput(params, JSON.parse(JSON.stringify(uniques)));
 				return true;
 			});
-			return  true;
-		}	
+			return true;
+		}
 		return true;
 	});
 

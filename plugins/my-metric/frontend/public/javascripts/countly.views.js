@@ -100,6 +100,8 @@ window.metricview = countlyView.extend({
     },
 
     loadProgressDate: function (obj) {
+
+        var self = this;
         var elem = $('#valuesTimeBar');
         var total = 0;
 
@@ -132,10 +134,10 @@ window.metricview = countlyView.extend({
             Object.values(obj).forEach(function (o) {
                 // Inject innner elements in .bar class element after every 3 element after the percentile
                 o.my_metric_count = Math.round(o.my_metric_count * percent);
-                elem.find('.bar').append('<div class="bar-inner" style="width:' + lastElemFixer[lenInc] + '%;" data-item="' + o.date + '"></div>');
+                elem.find('.bar').append('<div class="bar-inner" style="width:' + lastElemFixer[lenInc] + '%;" data-item="' + self.formatDate(o.date) + '"></div>');
                 lenInc++;
             })
-            elem.append('<div class="number" data-item="' + obj[0].date + '" style="color: rgb(82, 163, 239);">' + obj[0].date + '</div>');
+            elem.append('<div class="number" data-item="' + self.formatDate(obj[0].date) + '" style="color: rgb(82, 163, 239);">' + self.formatDate(obj[0].date) + '</div>');
         }
     },
 
@@ -149,7 +151,16 @@ window.metricview = countlyView.extend({
             "color": "#135f99"
         }], '#dashboard-graph');
     },
+    formatDate: function(d) {
+        var date = new Date(d);
+        var Year = date.getFullYear();
+        var Day  = date.getDate();
+        var Month = date.getMonth();
+        
+        var months = [$.i18n.map["my-metric.months.jan"],$.i18n.map["my-metric.months.feb"],$.i18n.map["my-metric.months.mar"],$.i18n.map["my-metric.months.apr"],$.i18n.map["my-metric.months.may"],$.i18n.map["my-metric.months.jun"],$.i18n.map["my-metric.months.jul"],$.i18n.map["my-metric.months.aug"],$.i18n.map["my-metric.months.sep"],$.i18n.map["my-metric.months.oct"],$.i18n.map["my-metric.months.nov"],$.i18n.map["my-metric.months.dec"]];
 
+        return Day + " " + months[parseInt(Month)] + ", " + Year;
+    },
     loadTable: function (obj) {
         var self = this;
         var elem = $('#dataTableMetrics');
@@ -161,7 +172,8 @@ window.metricview = countlyView.extend({
                     { 
                         "mData": "date",            
                         sType:"formatted-num", 
-                        "sTitle": jQuery.i18n.map["my-metric.table-date-title"]
+                        "sTitle": jQuery.i18n.map["my-metric.table-date-title"],
+                        "mRender":function(d) {return self.formatDate(d)}
                     },
                     { 
                        "mData": "my_metric_count", 
