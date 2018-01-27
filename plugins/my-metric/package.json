@@ -1,8 +1,8 @@
 {
   "name": "my-metric",
-  "title": "My Metric Final",
+  "title": "My Metric",
   "version": "0.1.0",
-  "description": "Final Metric Display",
+  "description": "Display spesific metric values by date",
   "author": "Ahmet Ozan Tekin",
   "homepage": "http://github.com/Countly/countly-server.git",
   "repository": {
@@ -19,7 +19,9 @@
     "times of day",
     "session",
     "events",
-    "visualization"
+    "visualization",
+    "metric values",
+    "metric"
   ],
   "dependencies": {},
   "private": true
